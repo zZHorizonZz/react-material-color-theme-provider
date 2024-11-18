@@ -1,7 +1,7 @@
 {
   "name": "react-material-theme-provider",
-  "version": "0.1.0",
-  "license": "MIT",
+  "version": "0.1.1",
+  "license": "Apache-2.0",
   "description": "Material Design 3 theme token generator for React applications",
   "keywords": [
     "material-design",
@@ -11,6 +11,10 @@
     "tokens",
     "css-variables"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zZHorizonZz/react-material-theme-provider.git"
+  },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
