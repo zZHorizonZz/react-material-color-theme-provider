@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { argbFromHex, type DynamicScheme } from "@material/material-color-utilities";
 import { type MaterialTheme, type MaterialThemeContextType, type MaterialThemeProviderProps, Variant } from "./types";
