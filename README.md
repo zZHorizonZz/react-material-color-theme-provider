@@ -16,13 +16,13 @@ is using the [Material Color Utilities](https://www.npmjs.com/package/@material/
 ## Installation
 
 ```bash
-npm install react-material-color-theme-provider
+npm install react-material-theme-provider
 ```
 
 ## Basic Usage
 
 ```tsx
-import {MaterialThemeProvider} from 'react-material-theme';
+import {MaterialThemeProvider} from 'react-material-theme-provider';
 
 function App() {
     return (

@@ -1,5 +1,5 @@
 {
-  "name": "react-material-color-theme-provider",
+  "name": "react-material-theme-provider",
   "version": "0.1.0",
   "license": "MIT",
   "description": "Material Design 3 theme token generator for React applications",
