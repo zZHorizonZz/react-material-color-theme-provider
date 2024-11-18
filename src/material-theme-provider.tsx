@@ -42,20 +42,19 @@ export function MaterialThemeProvider({
 	customColors = [],
 }: MaterialThemeProviderProps) {
 	// State for managing theme and source color
+	const [currentScheme, setCurrentScheme] = useState<DynamicScheme | null>(null);
 	const [materialTheme, setMaterialTheme] = useState<MaterialTheme | null>(null);
 	const [sourceColor, setSourceColor] = useState(defaultSourceColor);
 
 	// Effect for generating the theme when source color or custom colors change
 	useEffect(() => {
 		try {
-			// Convert hex colors to ARGB format
 			const argbColor = argbFromHex(sourceColor);
 			const customColorsArgb = customColors.map((color) => ({
 				...color,
 				value: argbFromHex(color.value),
 			}));
 
-			// Generate new theme with converted colors
 			const theme = createMaterialTheme(argbColor, Variant.FIDELITY, 0.0, customColorsArgb);
 			setMaterialTheme(theme);
 		} catch (error) {
@@ -63,14 +62,12 @@ export function MaterialThemeProvider({
 		}
 	}, [sourceColor, customColors]);
 
-	/**
-	 * Returns the current color scheme based on dark mode preference
-	 * @returns {DynamicScheme | null} Current color scheme or null if theme isn't generated
-	 */
-	const getCurrentScheme = (): DynamicScheme | null => {
-		if (!materialTheme) return null;
-		return isDark ? materialTheme.schemes.dark : materialTheme.schemes.light;
-	};
+	// Effect for setting the current color scheme based on theme and dark mode
+	useEffect(() => {
+		if (!materialTheme) return;
+		const scheme = isDark ? materialTheme.schemes.dark : materialTheme.schemes.light;
+		setCurrentScheme(scheme);
+	}, [materialTheme, isDark]);
 
 	// Effect for injecting CSS variables when theme or dark mode changes
 	useEffect(() => {
@@ -88,7 +85,7 @@ export function MaterialThemeProvider({
 			value={{
 				materialTheme,
 				setSourceColor,
-				currentScheme: getCurrentScheme(),
+				currentScheme,
 			}}
 		>
 			{children}
