@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useTransition } from "react";
 import { argbFromHex, type DynamicScheme } from "@material/material-color-utilities";
 import { type MaterialTheme, type MaterialThemeContextType, type MaterialThemeProviderProps, Variant } from "./types";
 import { createMaterialTheme, getThemeTokens } from "./theme-utils";
@@ -12,9 +12,9 @@ import { createMaterialTheme, getThemeTokens } from "./theme-utils";
  * @property {DynamicScheme | null} currentScheme - Current color scheme based on light/dark mode
  */
 const MaterialThemeContext = createContext<MaterialThemeContextType>({
-	materialTheme: null,
-	setSourceColor: () => {},
-	currentScheme: null,
+  materialTheme: null,
+  setSourceColor: () => {},
+  currentScheme: null,
 });
 
 /**
@@ -24,8 +24,9 @@ const MaterialThemeContext = createContext<MaterialThemeContextType>({
  * @component
  * @param {MaterialThemeProviderProps} props - Component props
  * @param {ReactNode} props.children - Child components to be wrapped
- * @param {string} [props.defaultSourceColor="#6D509F"] - Initial source color in hex format
  * @param {boolean} [props.isDark=false] - Whether to use dark mode
+ * @param {Variant} [props.variant=Variant.FIDELITY] - Theme variant to use
+ * @param {string} [props.defaultSourceColor="#6D509F"] - Initial source color in hex format
  * @param {Array<CustomColor>} [props.customColors=[]] - Array of custom color definitions
  *
  * @example
@@ -36,61 +37,74 @@ const MaterialThemeContext = createContext<MaterialThemeContextType>({
  * ```
  */
 export function MaterialThemeProvider({
-	children,
-	defaultSourceColor = "#6D509F",
-	isDark = false,
-	customColors = [],
+  children,
+  isDark = false,
+  variant = Variant.FIDELITY,
+  defaultSourceColor = "#6D509F",
+  customColors = [],
 }: MaterialThemeProviderProps) {
-	// State for managing theme and source color
-	const [currentScheme, setCurrentScheme] = useState<DynamicScheme | null>(null);
-	const [materialTheme, setMaterialTheme] = useState<MaterialTheme | null>(null);
-	const [sourceColor, setSourceColor] = useState(defaultSourceColor);
+  // State for managing theme and source color
+  const [isPending, startTransition] = useTransition();
+  const [currentScheme, setCurrentScheme] = useState<DynamicScheme | null>(null);
+  const [materialTheme, setMaterialTheme] = useState<MaterialTheme | null>(null);
+  const [sourceColor, setSourceColor] = useState(defaultSourceColor);
 
-	// Effect for generating the theme when source color or custom colors change
-	useEffect(() => {
-		try {
-			const argbColor = argbFromHex(sourceColor);
-			const customColorsArgb = customColors.map((color) => ({
-				...color,
-				value: argbFromHex(color.value),
-			}));
+  const handleSetSourceColor = (color: string) => {
+    startTransition(() => {
+      setSourceColor(color);
+    });
+  };
 
-			const theme = createMaterialTheme(argbColor, Variant.FIDELITY, 0.0, customColorsArgb);
-			setMaterialTheme(theme);
-		} catch (error) {
-			console.error("Error generating material theme:", error);
-		}
-	}, [sourceColor, customColors]);
+  // Effect for generating the theme when source color or custom colors change
+  useEffect(() => {
+    try {
+      const argbColor = argbFromHex(sourceColor);
+      const customColorsArgb = customColors.map((color) => ({
+        ...color,
+        value: argbFromHex(color.value),
+      }));
 
-	// Effect for setting the current color scheme based on theme and dark mode
-	useEffect(() => {
-		if (!materialTheme) return;
-		const scheme = isDark ? materialTheme.schemes.dark : materialTheme.schemes.light;
-		setCurrentScheme(scheme);
-	}, [materialTheme, isDark]);
+      // Wrap theme generation in startTransition
+      startTransition(() => {
+        const theme = createMaterialTheme(argbColor, Variant.FIDELITY, 0.0, customColorsArgb);
+        setMaterialTheme(theme);
+      });
+    } catch (error) {
+      console.error("Error generating material theme:", error);
+    }
+  }, [sourceColor, customColors]);
 
-	// Effect for injecting CSS variables when theme or dark mode changes
-	useEffect(() => {
-		if (!materialTheme) return;
+  // Effect for setting the current color scheme based on theme and dark mode
+  useEffect(() => {
+    if (!materialTheme) return;
+    const scheme = isDark ? materialTheme.schemes.dark : materialTheme.schemes.light;
+    setCurrentScheme(scheme);
+  }, [materialTheme, isDark]);
 
-		// Get and apply theme tokens to document root
-		const tokens = getThemeTokens(materialTheme, isDark);
-		tokens.forEach((value, key) => {
-			document.documentElement.style.setProperty(key, value);
-		});
-	}, [materialTheme, isDark]);
+  // Effect for injecting CSS variables when theme or dark mode changes
+  useEffect(() => {
+    if (!materialTheme) return;
 
-	return (
-		<MaterialThemeContext.Provider
-			value={{
-				materialTheme,
-				setSourceColor,
-				currentScheme,
-			}}
-		>
-			{children}
-		</MaterialThemeContext.Provider>
-	);
+    // Get and apply theme tokens to document root
+    startTransition(() => {
+      const tokens = getThemeTokens(materialTheme, isDark);
+      tokens.forEach((value, key) => {
+        document.documentElement.style.setProperty(key, value);
+      });
+    });
+  }, [materialTheme, isDark]);
+
+  return (
+    <MaterialThemeContext.Provider
+      value={{
+        materialTheme,
+        setSourceColor: handleSetSourceColor,
+        currentScheme,
+      }}
+    >
+      {children}
+    </MaterialThemeContext.Provider>
+  );
 }
 
 /**
@@ -109,9 +123,9 @@ export function MaterialThemeProvider({
  * ```
  */
 export function useMaterialTheme() {
-	const context = useContext(MaterialThemeContext);
-	if (context === undefined) {
-		throw new Error("useMaterialTheme must be used within a MaterialThemeProvider");
-	}
-	return context;
+  const context = useContext(MaterialThemeContext);
+  if (context === undefined) {
+    throw new Error("useMaterialTheme must be used within a MaterialThemeProvider");
+  }
+  return context;
 }

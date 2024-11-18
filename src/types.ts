@@ -8,24 +8,24 @@ import type { CustomColorGroup, DynamicScheme } from "@material/material-color-u
  * @enum {number}
  */
 export enum Variant {
-	/** Grayscale color scheme. */
-	MONOCHROME = 0,
-	/** Color theme that is near grayscale. */
-	NEUTRAL = 1,
-	/** Color theme with low to medium colorfulness and a Tertiary TonalPalette with a hue related to the source color. */
-	TONAL_SPOT = 2,
-	/** Color theme that maxes out colorfulness at each position in the Primary Tonal Palette. */
-	VIBRANT = 3,
-	/** Color theme that is intentionally detached from the source color. */
-	EXPRESSIVE = 4,
-	/** A scheme that places the source color in Scheme. primaryContainer. */
-	FIDELITY = 5,
-	/** A scheme that places the source color in Scheme. primaryContainer. */
-	CONTENT = 6,
-	/** A playful theme - the source color's hue does not appear in the theme. */
-	RAINBOW = 7,
-	/** A playful theme - the source color's hue does not appear in the theme. */
-	FRUIT_SALAD = 8,
+  /** Grayscale color scheme. */
+  MONOCHROME = 0,
+  /** Color theme that is near grayscale. */
+  NEUTRAL = 1,
+  /** Color theme with low to medium colorfulness and a Tertiary TonalPalette with a hue related to the source color. */
+  TONAL_SPOT = 2,
+  /** Color theme that maxes out colorfulness at each position in the Primary Tonal Palette. */
+  VIBRANT = 3,
+  /** Color theme that is intentionally detached from the source color. */
+  EXPRESSIVE = 4,
+  /** A scheme that places the source color in Scheme. primaryContainer. */
+  FIDELITY = 5,
+  /** A scheme that places the source color in Scheme. primaryContainer. */
+  CONTENT = 6,
+  /** A playful theme - the source color's hue does not appear in the theme. */
+  RAINBOW = 7,
+  /** A playful theme - the source color's hue does not appear in the theme. */
+  FRUIT_SALAD = 8,
 }
 
 /**
@@ -41,13 +41,13 @@ export enum Variant {
  * @property {CustomColorGroup[]} customColors - Array of custom color definitions with their variations
  */
 export interface MaterialTheme {
-	source: number;
-	variant: Variant;
-	schemes: {
-		light: DynamicScheme;
-		dark: DynamicScheme;
-	};
-	customColors: CustomColorGroup[];
+  source: number;
+  variant: Variant;
+  schemes: {
+    light: DynamicScheme;
+    dark: DynamicScheme;
+  };
+  customColors: CustomColorGroup[];
 }
 
 /**
@@ -60,9 +60,9 @@ export interface MaterialTheme {
  * @property {DynamicScheme | null} currentScheme - Current color scheme based on light/dark mode preference
  */
 export interface MaterialThemeContextType {
-	materialTheme: MaterialTheme | null;
-	setSourceColor: (color: string) => void;
-	currentScheme: DynamicScheme | null;
+  materialTheme: MaterialTheme | null;
+  setSourceColor: (color: string) => void;
+  currentScheme: DynamicScheme | null;
 }
 
 /**
@@ -71,20 +71,22 @@ export interface MaterialThemeContextType {
  *
  * @interface MaterialThemeProviderProps
  * @property {ReactNode} children - Child components to be wrapped by the provider
- * @property {string} [defaultSourceColor] - Initial source color in hex format (e.g., "#6D509F")
  * @property {boolean} [isDark] - Whether to use dark mode color scheme
+ * @property {Variant} [variant] - Theme variant to use for color scheme generation
+ * @property {string} [defaultSourceColor] - Initial source color in hex format (e.g., "#6D509F")
  * @property {Array<{name: string, value: string, blend: boolean}>} [customColors] - Custom color definitions
  * @property {string} customColors[].name - Identifier for the custom color
  * @property {string} customColors[].value - Hex color value
  * @property {boolean} customColors[].blend - Whether to blend with the source color
  */
 export interface MaterialThemeProviderProps {
-	children: ReactNode;
-	defaultSourceColor?: string;
-	isDark?: boolean;
-	customColors?: Array<{
-		name: string;
-		value: string;
-		blend: boolean;
-	}>;
+  children: ReactNode;
+  isDark?: boolean;
+  variant?: Variant;
+  defaultSourceColor?: string;
+  customColors?: Array<{
+    name: string;
+    value: string;
+    blend: boolean;
+  }>;
 }
