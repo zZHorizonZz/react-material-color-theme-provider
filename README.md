@@ -16,7 +16,7 @@ is using the [Material Color Utilities](https://www.npmjs.com/package/@material/
 ## Installation
 
 ```bash
-npm install react-material-theme-provider
+npm install react-material-theme-provider @material/material-color-utilities
 ```
 
 ## Basic Usage
