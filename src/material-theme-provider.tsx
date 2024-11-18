@@ -44,53 +44,38 @@ export function MaterialThemeProvider({
   customColors = [],
 }: MaterialThemeProviderProps) {
   // State for managing theme and source color
-  const [isPending, startTransition] = useTransition();
   const [currentScheme, setCurrentScheme] = useState<DynamicScheme | null>(null);
   const [materialTheme, setMaterialTheme] = useState<MaterialTheme | null>(null);
   const [sourceColor, setSourceColor] = useState(defaultSourceColor);
 
-  const handleSetSourceColor = (color: string) => {
-    startTransition(() => {
-      setSourceColor(color);
-    });
-  };
-
-  // Effect for generating the theme when source color or custom colors change
+  // Theme generation effect
   useEffect(() => {
     try {
       const argbColor = argbFromHex(sourceColor);
-      const customColorsArgb = customColors.map((color) => ({
+      /*const customColorsArgb = customColors.map((color) => ({
         ...color,
         value: argbFromHex(color.value),
-      }));
+      }));*/
 
-      // Wrap theme generation in startTransition
-      startTransition(() => {
-        const theme = createMaterialTheme(argbColor, Variant.FIDELITY, 0.0, customColorsArgb);
-        setMaterialTheme(theme);
-      });
+      const theme = createMaterialTheme(argbColor, variant, 0.0);
+      setMaterialTheme(theme);
     } catch (error) {
       console.error("Error generating material theme:", error);
     }
-  }, [sourceColor, customColors]);
+  }, [sourceColor, variant]);
 
   // Effect for setting the current color scheme based on theme and dark mode
   useEffect(() => {
     if (!materialTheme) return;
+
+    // Update scheme
     const scheme = isDark ? materialTheme.schemes.dark : materialTheme.schemes.light;
     setCurrentScheme(scheme);
-  }, [materialTheme, isDark]);
 
-  // Effect for injecting CSS variables when theme or dark mode changes
-  useEffect(() => {
-    if (!materialTheme) return;
-
-    // Get and apply theme tokens to document root
-    startTransition(() => {
-      const tokens = getThemeTokens(materialTheme, isDark);
-      tokens.forEach((value, key) => {
-        document.documentElement.style.setProperty(key, value);
-      });
+    // Apply tokens
+    const tokens = getThemeTokens(materialTheme, isDark);
+    tokens.forEach((value, key) => {
+      document.documentElement.style.setProperty(key, value);
     });
   }, [materialTheme, isDark]);
 
@@ -98,7 +83,7 @@ export function MaterialThemeProvider({
     <MaterialThemeContext.Provider
       value={{
         materialTheme,
-        setSourceColor: handleSetSourceColor,
+        setSourceColor,
         currentScheme,
       }}
     >
