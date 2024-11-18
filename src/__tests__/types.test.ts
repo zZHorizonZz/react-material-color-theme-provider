@@ -15,8 +15,7 @@ describe("Variant enum", () => {
 		];
 
 		// Get only the string keys from the enum
-		const enumKeys = Object.keys(Variant)
-			.filter(key => isNaN(Number(key)));
+		const enumKeys = Object.keys(Variant).filter((key) => Number.isNaN(Number(key)));
 
 		expect(enumKeys).toEqual(expect.arrayContaining(expectedVariants));
 		expect(enumKeys.length).toBe(expectedVariants.length);
