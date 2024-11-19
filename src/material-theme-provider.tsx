@@ -11,11 +11,7 @@ import { createMaterialTheme, getThemeTokens } from "./theme-utils";
  * @property {Function} setSourceColor - Function to update the theme's source color
  * @property {DynamicScheme | null} currentScheme - Current color scheme based on light/dark mode
  */
-const MaterialThemeContext = createContext<MaterialThemeContextType>({
-  materialTheme: null,
-  setSourceColor: () => {},
-  currentScheme: null,
-});
+const MaterialThemeContext = createContext<MaterialThemeContextType | undefined>(undefined);
 
 /**
  * Provider component for Material Design 3 theming system.
